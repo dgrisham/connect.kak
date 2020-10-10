@@ -129,7 +129,7 @@ alias global explore-files fzf-files
 alias global explore-buffers fzf-buffers
 
 # Terminal settings
-map global normal <c-w> ': enter-user-mode terminal<ret>' -docstring 'Terminal'
+map global normal -docstring 'Terminal' <c-w> ': enter-user-mode terminal<ret>'
 
 # Create a new window
 map global normal <c-t> ': connect-terminal<ret>'
@@ -140,6 +140,42 @@ map global normal <c-q> ': quit!<ret>'
 
 # Yank ring
 map global normal Y ': yank-ring<ret>'
+```
+
+### Turn Kakoune into an IDE
+
+``` kak
+define-command ide -params 0..1 -docstring 'ide [session-name]: Turn Kakoune into an IDE' %{
+  # Session name
+  try %{
+    rename-session %arg{1}
+  }
+
+  # Main client
+  rename-client main
+  set-option global jumpclient main
+
+  # Tools client
+  new %{
+    rename-client tools
+    set-option global toolsclient tools
+  }
+
+  # Docs client
+  new %{
+    rename-client docs
+    set-option global docsclient docs
+  }
+
+  # Project drawer
+  dolphin
+
+  # Git
+  > lazygit
+
+  # Terminal
+  >
+}
 ```
 
 ### Custom environment
@@ -157,8 +193,8 @@ set-option global connect_environment %{
 
 ### Custom connect commands
 
-You can also define your own connect commands in
-`$XDG_CONFIG_HOME/kak/connect/commands` and `$XDG_CONFIG_HOME/kak/connect/aliases`.
+You can also define your own connect commands by setting the `connect_paths` option.
+By default, it is set to your `$XDG_CONFIG_HOME/kak/connect/commands` and `$XDG_CONFIG_HOME/kak/connect/aliases`.
 See [commands] and [aliases] for examples.
 
 ### Custom prompt
@@ -181,6 +217,6 @@ PS1='$(~/.local/share/kak/connect/prompt) $ '
 - [Aliases]
 - [Modules]
 
-[Commands]: rc/paths/commands
-[Aliases]: rc/paths/aliases
+[Commands]: rc/connect/commands
+[Aliases]: rc/connect/aliases
 [Modules]: rc/modules
