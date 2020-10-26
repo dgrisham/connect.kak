@@ -7,9 +7,9 @@
 # – fd (https://github.com/sharkdp/fd)
 # – bat (https://github.com/sharkdp/bat)
 
-target=$(alias_call skag $@ | perl -pe 's/^(.*?):(\d+):\s*.*?$/\1 +\2/')
+read -r target line <<< $(alias_call skag $@ | perl -pe 's/^(.*?):(\d+):\s*.*?$/\1 \2/')
 [[ -z "$target" ]] && return 1
-:edit $target
+:edit +$line $target
 
 # :edit $(
     # fd --type file . "$@" |
