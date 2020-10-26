@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Get the current buffer content.
+mkfifo buffer.fifo
+trap 'rm buffer.fifo' EXIT
+:send set-option buffer writemethod overwrite
+:send write buffer.fifo
+cat buffer.fifo

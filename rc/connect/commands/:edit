@@ -1,27 +1,48 @@
 #!/bin/sh
 
+# Open files.
+#
+# Usage:
+#
+# :edit <file>
+# :edit +<line> <file>
+# :edit +<line>:<column> <file>
+# [files] | :edit
+#
+# Note: Order matters.
+
 . "$KAKOUNE_PRELUDE"
+
+# Read files from stdin when a terminal is available.
+# Reason: kak-desktop
+if [ ! -t 0 -a -t 1 ]; then
+  while read file; do
+    set -- "$file" "$@"
+  done
+fi
 
 # Skip options
 [ "$1" = '--' ] && shift
 
-# Open files
+# Open files at the given position (line and column) if specified.
 commands=$(
   while [ "$1" ]; do
-    file=$(realpath "$1")
-    case "$2" in
+    case "$1" in
       ('+'*':'*)
-        line=${2#+}; line=${line%:*}
-        column=${2#*:}
+        line=${1#+}; line=${line%:*}
+        column=${1#*:}
+        file=$(realpath "$2")
         shift 2
         kak_escape edit "$file" "$line" "$column"
         ;;
       ('+'*)
-        line=${2#+}
+        line=${1#+}
+        file=$(realpath "$2")
         shift 2
         kak_escape edit "$file" "$line"
         ;;
       (*)
+        file=$(realpath "$1")
         shift 1
         kak_escape edit "$file"
         ;;
