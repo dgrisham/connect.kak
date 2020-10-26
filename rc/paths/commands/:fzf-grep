@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# fzf
+# https://github.com/junegunn/fzf
+
+# Dependencies:
+# – fd (https://github.com/sharkdp/fd)
+# – bat (https://github.com/sharkdp/bat)
+
+target=$(alias_call skag $@ | perl -pe 's/^(.*?):(\d+):\s*.*?$/\1 +\2/')
+[[ -z "$target" ]] && return 1
+:edit $target
+
+# :edit $(
+    # fd --type file . "$@" |
+    # fzf --preview-window=down:60% --preview 'bat --style=numbers --color=always --line-range :500 {}' --prompt='(f)>'
+# )

@@ -1,0 +1,45 @@
+#!/bin/sh
+
+main() {
+    local session="$1"
+    shift 1
+    connect "$session" "$@"
+}
+
+connect() {
+  session=$1
+  shift
+  setsid kak -s "$session" -d < /dev/null > /dev/null 2>&1 &
+  kak -c "$session" -e "connect-detach $@"
+  sh connect.sh
+}
+
+prompt_kakoune_session() {
+  kak_session_list=$(kak -l | sort)
+  echo 'Kakoune sessions:'
+  printf "$kak_session_list" | number_lines
+  echo '+ create new session'
+  printf 'Kakoune session:'
+  read kak_session
+  if is_number "$kak_session"; then
+    kak_session=$(echo "$kak_session_list" | get_line "$kak_session")
+  fi
+
+  text=$kak_session
+}
+
+# Utility functions ────────────────────────────────────────────────────────────
+
+is_number() {
+  test "$1" -eq "$1" 2> /dev/null
+}
+
+number_lines() {
+  awk '{ print NR, $0 }'
+}
+
+get_line() {
+  sed "${1}q;d"
+}
+
+main "$@"
